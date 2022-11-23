@@ -1,4 +1,4 @@
-import 'package:pokemons/features/pokemons/data/models/response/pokemons_list_item_dto.dart';
+import 'package:pokemons/features/pokemons/data/dto/response/pokemons_list_item_dto.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'pokemons_list_dto.g.dart';

@@ -2,30 +2,33 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:pokemons/di/dependency_register.dart';
 import 'package:pokemons/features/pokemons/app/cubit/pokemons_list_cubit.dart';
+import 'package:pokemons/features/pokemons/data/dao/pokemon_list_item_dao.dart';
 import 'package:pokemons/features/pokemons/domain/entities/pokemon_details.dart';
-import 'package:pokemons/features/pokemons/domain/entities/pokemons_list_item.dart';
+import 'package:pokemons/features/pokemons/domain/entities/pokemon_list_item.dart';
 import 'package:pokemons/features/pokemons/domain/pokemons_repository.dart';
 
 class MockPokemonsRepository extends Mock implements PokemonsRepository {}
+class MockPokemonListItemDao extends Mock implements PokemonListItemDao {}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  const List<PokemonsListItem> mockList = [
-    PokemonsListItem(
+  const List<PokemonListItem> mockList = [
+    PokemonListItem(
       id: 1,
       name: 'Testowy pokemon 1',
     ),
-    PokemonsListItem(
+    PokemonListItem(
       id: 2,
       name: 'Testowy pokemon 2',
     ),
-    PokemonsListItem(
+    PokemonListItem(
       id: 3,
       name: 'Testowy pokemon 3',
     ),
-    PokemonsListItem(
+    PokemonListItem(
       id: 4,
       name: 'Testowy pokemon 4',
     ),
@@ -42,30 +45,52 @@ void main() {
     ),
   };
 
+  // setUpAll(() async {
+  //   await DependencyRegister.register();
+  // });
+
   group('PokemonsListCubit', () {
 
     late PokemonsRepository pokemonsRepository;
+    late MockPokemonListItemDao pokemonListItemDao;
     late PokemonsListCubit pokemonsCubit;
-    int remoteLimit = 40;
+    int remoteLimit = 4;
 
     setUp(() async {
       pokemonsRepository = MockPokemonsRepository();
+      pokemonListItemDao = MockPokemonListItemDao();
+
       when(
         () => pokemonsRepository.getRemotePokemons(limit: any(named: 'limit'), offset: any(named: 'offset')),
-      ).thenAnswer((_) async => Future.value(List<PokemonsListItem>.generate(remoteLimit, (i) => mockList[i % mockList.length])));
-      pokemonsCubit = PokemonsListCubit(pokemonsRepository: pokemonsRepository);
+      ).thenAnswer((_) async => Future.value(List<PokemonListItem>.generate(remoteLimit, (i) => mockList[i % mockList.length])));
+
+      when(
+        () => pokemonListItemDao.getPokemonsPart(any(), any()),
+      ).thenAnswer((_) async => Future.value(List<PokemonListItem>.generate(remoteLimit, (i) => mockList[i % mockList.length])));
+      when(
+        () => pokemonListItemDao.deleteAllPokemons(),
+      ).thenAnswer((_) async {});
+      when(
+        () => pokemonListItemDao.insertPokemons(any()),
+      ).thenAnswer((_) async {});
+
+
+      pokemonsCubit = PokemonsListCubit(
+        pokemonsRepository: pokemonsRepository,
+        pokemonListItemDao: pokemonListItemDao,
+      );
 
     });
 
     group('initialize', () {
 
       test('initial list is empty', () {
-        final pokemonsCubit = PokemonsListCubit(pokemonsRepository: pokemonsRepository);
+        final pokemonsCubit = PokemonsListCubit(pokemonsRepository: pokemonsRepository, pokemonListItemDao: pokemonListItemDao,);
         expect(pokemonsCubit.state.results, const []);
       });
 
       test('initial status is normal', () {
-        final pokemonsCubit = PokemonsListCubit(pokemonsRepository: pokemonsRepository);
+        final pokemonsCubit = PokemonsListCubit(pokemonsRepository: pokemonsRepository, pokemonListItemDao: pokemonListItemDao,);
         expect(pokemonsCubit.state.searchStatus, PokemonsListStatus.normal);
       });
 
@@ -121,7 +146,7 @@ void main() {
         'handle API error for appending',
         setUp: () {
           when(
-                () => pokemonsRepository.getRemotePokemons(limit: any(named: 'limit'), offset: any(named: 'offset')),
+              () => pokemonListItemDao.getPokemonsPart(any(), any()),
           ).thenThrow(Exception('_'));
         },
         build: () => pokemonsCubit,

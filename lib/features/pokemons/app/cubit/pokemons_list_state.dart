@@ -5,7 +5,7 @@ enum PokemonsListStatus { searching, normal, failure }
 class PokemonsListState extends Equatable {
 
   final PokemonsListStatus searchStatus;
-  final List<PokemonsListItem> results;
+  final List<PokemonListItem> results;
   final String? searchPhrase;
 
   final bool appending;
@@ -34,7 +34,7 @@ class PokemonsListState extends Equatable {
 
   PokemonsListState copyWith({
     PokemonsListStatus? searchStatus,
-    List<PokemonsListItem>? results,
+    List<PokemonListItem>? results,
     String? searchPhrase,
     int? currentOffset,
     bool? appending,
@@ -53,7 +53,7 @@ class PokemonsListState extends Equatable {
 
   PokemonsListState copyAndClearSearchPhrase({
     PokemonsListStatus? searchStatus,
-    List<PokemonsListItem>? results,
+    List<PokemonListItem>? results,
     String? searchPhrase,
     int? currentOffset,
     bool? appending,

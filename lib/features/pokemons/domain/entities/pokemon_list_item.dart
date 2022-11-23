@@ -1,12 +1,14 @@
 import 'package:equatable/equatable.dart';
+import 'package:floor/floor.dart';
 
-class PokemonsListItem extends Equatable {
-
+@entity
+class PokemonListItem extends Equatable {
+  @primaryKey
   final int id;
   final String name;
   final String? imageUrl;
 
-  const PokemonsListItem({
+  const PokemonListItem({
     required this.id,
     required this.name,
     this.imageUrl,
