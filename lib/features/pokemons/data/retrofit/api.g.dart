@@ -48,13 +48,36 @@ class _Api implements Api {
   }
 
   @override
-  Future<PokemonsFormDto> getForm(id) async {
+  Future<PokemonDetailsDto> getPokemonDetails(id) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     final _result = await _dio
-        .fetch<Map<String, dynamic>>(_setStreamType<PokemonsFormDto>(Options(
+        .fetch<Map<String, dynamic>>(_setStreamType<PokemonDetailsDto>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              'pokemon/${id}/',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = PokemonDetailsDto.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<PokemonFormsDto> getForm(id) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final _result = await _dio
+        .fetch<Map<String, dynamic>>(_setStreamType<PokemonFormsDto>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -66,7 +89,7 @@ class _Api implements Api {
               data: _data,
             )
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = PokemonsFormDto.fromJson(_result.data!);
+    final value = PokemonFormsDto.fromJson(_result.data!);
     return value;
   }
 

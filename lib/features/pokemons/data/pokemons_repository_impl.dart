@@ -17,10 +17,11 @@ class PokemonsRepositoryImpl extends PokemonsRepository {
     return response.results.map((e) => e.toEntity()).toList();
   }
 
-  // @override
-  // Future<PokemonDetails> getRemotePokemonDetails({ required int id }) {
-  //   return Future.value(PokemonsRepositoryMock.mockDetails[id]);
-  // }
+  @override
+  Future<PokemonDetails> getRemotePokemonDetails({ required int id }) async {
+    var response = await _api.getPokemonDetails(id);
+    return response.toEntity();
+  }
 
 
   Future<String?> getRemotePokemonImage({ required int id }) async {

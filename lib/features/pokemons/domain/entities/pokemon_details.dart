@@ -1,22 +1,22 @@
 import 'package:equatable/equatable.dart';
 import 'package:floor/floor.dart';
-import 'package:pokemons/features/pokemons/domain/entities/pokemon_feature.dart';
 
-@entity
 class PokemonDetails extends Equatable {
   @primaryKey
   final int id;
   final String name;
   final String? imageUrl;
-  final List<PokemonFeature> features;
+  final String? imageUrlBig;
+  final int baseExperience;
 
   const PokemonDetails({
     required this.id,
     required this.name,
     this.imageUrl,
-    this.features = const [],
+    this.imageUrlBig,
+    required this.baseExperience,
   });
 
   @override
-  List<Object?> get props => [ id, name, imageUrl, features ];
+  List<Object?> get props => [ id, name, imageUrl, imageUrlBig, baseExperience ];
 }

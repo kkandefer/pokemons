@@ -3,7 +3,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:pokemons/di/dependency_register.dart';
-import 'package:pokemons/features/pokemons/app/cubit/pokemons_list_cubit.dart';
+import 'package:pokemons/features/pokemons/app/cubit/pokemons_list/pokemons_list_cubit.dart';
 import 'package:pokemons/features/pokemons/data/dao/pokemon_list_item_dao.dart';
 import 'package:pokemons/features/pokemons/domain/entities/pokemon_details.dart';
 import 'package:pokemons/features/pokemons/domain/entities/pokemon_list_item.dart';
@@ -38,10 +38,12 @@ void main() {
     1: PokemonDetails(
       id: 1,
       name: 'Testowy pokemon 1',
+      baseExperience: 101,
     ),
     2: PokemonDetails(
       id: 2,
       name: 'Testowy pokemon 2',
+      baseExperience: 102,
     ),
   };
 

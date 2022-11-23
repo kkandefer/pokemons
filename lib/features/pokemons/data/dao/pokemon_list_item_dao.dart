@@ -16,7 +16,7 @@ abstract class PokemonListItemDao {
   @Query('SELECT * FROM PokemonListItem WHERE name = :name')
   Future<PokemonListItem?> findPokemonByName(String name);
 
-  @insert
+  @Insert(onConflict: OnConflictStrategy.ignore)
   Future<void> insertPokemons(List<PokemonListItem> pokemons);
 
   @update

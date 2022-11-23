@@ -63,6 +63,8 @@ class _$PokemonsDatabase extends PokemonsDatabase {
 
   PokemonListItemDao? _pokemonListItemDaoInstance;
 
+  FavoritePokemonDao? _favoritePokemonDaoInstance;
+
   Future<sqflite.Database> open(
     String path,
     List<Migration> migrations, [
@@ -86,6 +88,8 @@ class _$PokemonsDatabase extends PokemonsDatabase {
       onCreate: (database, version) async {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `PokemonListItem` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `imageUrl` TEXT, PRIMARY KEY (`id`))');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `FavoritePokemon` (`sequence` INTEGER NOT NULL, `id` INTEGER NOT NULL, `name` TEXT NOT NULL, `imageUrl` TEXT, `imageUrlBig` TEXT, `baseExperience` INTEGER NOT NULL, PRIMARY KEY (`id`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -97,6 +101,12 @@ class _$PokemonsDatabase extends PokemonsDatabase {
   PokemonListItemDao get pokemonListItemDao {
     return _pokemonListItemDaoInstance ??=
         _$PokemonListItemDao(database, changeListener);
+  }
+
+  @override
+  FavoritePokemonDao get favoritePokemonDao {
+    return _favoritePokemonDaoInstance ??=
+        _$FavoritePokemonDao(database, changeListener);
   }
 }
 
@@ -187,12 +197,126 @@ class _$PokemonListItemDao extends PokemonListItemDao {
   @override
   Future<void> insertPokemons(List<PokemonListItem> pokemons) async {
     await _pokemonListItemInsertionAdapter.insertList(
-        pokemons, OnConflictStrategy.abort);
+        pokemons, OnConflictStrategy.ignore);
   }
 
   @override
   Future<void> updatePokemons(List<PokemonListItem> pokemons) async {
     await _pokemonListItemUpdateAdapter.updateList(
         pokemons, OnConflictStrategy.abort);
+  }
+}
+
+class _$FavoritePokemonDao extends FavoritePokemonDao {
+  _$FavoritePokemonDao(
+    this.database,
+    this.changeListener,
+  )   : _queryAdapter = QueryAdapter(database),
+        _favoritePokemonInsertionAdapter = InsertionAdapter(
+            database,
+            'FavoritePokemon',
+            (FavoritePokemon item) => <String, Object?>{
+                  'sequence': item.sequence,
+                  'id': item.id,
+                  'name': item.name,
+                  'imageUrl': item.imageUrl,
+                  'imageUrlBig': item.imageUrlBig,
+                  'baseExperience': item.baseExperience
+                }),
+        _favoritePokemonUpdateAdapter = UpdateAdapter(
+            database,
+            'FavoritePokemon',
+            ['id'],
+            (FavoritePokemon item) => <String, Object?>{
+                  'sequence': item.sequence,
+                  'id': item.id,
+                  'name': item.name,
+                  'imageUrl': item.imageUrl,
+                  'imageUrlBig': item.imageUrlBig,
+                  'baseExperience': item.baseExperience
+                }),
+        _favoritePokemonDeletionAdapter = DeletionAdapter(
+            database,
+            'FavoritePokemon',
+            ['id'],
+            (FavoritePokemon item) => <String, Object?>{
+                  'sequence': item.sequence,
+                  'id': item.id,
+                  'name': item.name,
+                  'imageUrl': item.imageUrl,
+                  'imageUrlBig': item.imageUrlBig,
+                  'baseExperience': item.baseExperience
+                });
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<FavoritePokemon> _favoritePokemonInsertionAdapter;
+
+  final UpdateAdapter<FavoritePokemon> _favoritePokemonUpdateAdapter;
+
+  final DeletionAdapter<FavoritePokemon> _favoritePokemonDeletionAdapter;
+
+  @override
+  Future<List<FavoritePokemon>> getFavoritePokemons() async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM FavoritePokemon ORDER BY sequence DESC',
+        mapper: (Map<String, Object?> row) => FavoritePokemon(
+            sequence: row['sequence'] as int,
+            id: row['id'] as int,
+            name: row['name'] as String,
+            imageUrl: row['imageUrl'] as String?,
+            imageUrlBig: row['imageUrlBig'] as String?,
+            baseExperience: row['baseExperience'] as int));
+  }
+
+  @override
+  Future<FavoritePokemon?> findPokemonById(int id) async {
+    return _queryAdapter.query('SELECT * FROM FavoritePokemon WHERE id = ?1',
+        mapper: (Map<String, Object?> row) => FavoritePokemon(
+            sequence: row['sequence'] as int,
+            id: row['id'] as int,
+            name: row['name'] as String,
+            imageUrl: row['imageUrl'] as String?,
+            imageUrlBig: row['imageUrlBig'] as String?,
+            baseExperience: row['baseExperience'] as int),
+        arguments: [id]);
+  }
+
+  @override
+  Future<int?> getMaxSequence() async {
+    await _queryAdapter
+        .queryNoReturn('SELECT MAX(sequence) FROM FavoritePokemon');
+  }
+
+  @override
+  Future<void> deleteAllFavoritePokemons() async {
+    await _queryAdapter.queryNoReturn('DELETE FROM FavoritePokemon');
+  }
+
+  @override
+  Future<void> insertFavoritePokemons(List<FavoritePokemon> pokemons) async {
+    await _favoritePokemonInsertionAdapter.insertList(
+        pokemons, OnConflictStrategy.replace);
+  }
+
+  @override
+  Future<void> insertFavoritePokemon(FavoritePokemon pokemon) async {
+    await _favoritePokemonInsertionAdapter.insert(
+        pokemon, OnConflictStrategy.replace);
+  }
+
+  @override
+  Future<void> updateFavoritePokemons(List<FavoritePokemon> pokemons) async {
+    await _favoritePokemonUpdateAdapter.updateList(
+        pokemons, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> deleteFavoritePokemon(FavoritePokemon pokemons) async {
+    await _favoritePokemonDeletionAdapter.delete(pokemons);
   }
 }
