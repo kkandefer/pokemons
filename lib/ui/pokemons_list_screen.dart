@@ -89,7 +89,7 @@ class _PokemonsListScreenState extends State<PokemonsListScreen> {
   _handleScroll() {
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.position.pixels;
-    if(maxScroll - currentScroll <= 400 && !_pokemonsListCubit.state.appending && !_pokemonsListCubit.state.hasRatherMax) {
+    if(maxScroll - currentScroll <= 600 && !_pokemonsListCubit.state.appending && !_pokemonsListCubit.state.hasRatherMax) {
       _pokemonsListCubit.append();
     }
   }

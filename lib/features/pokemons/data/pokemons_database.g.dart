@@ -112,6 +112,15 @@ class _$PokemonListItemDao extends PokemonListItemDao {
                   'id': item.id,
                   'name': item.name,
                   'imageUrl': item.imageUrl
+                }),
+        _pokemonListItemUpdateAdapter = UpdateAdapter(
+            database,
+            'PokemonListItem',
+            ['id'],
+            (PokemonListItem item) => <String, Object?>{
+                  'id': item.id,
+                  'name': item.name,
+                  'imageUrl': item.imageUrl
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -121,6 +130,8 @@ class _$PokemonListItemDao extends PokemonListItemDao {
   final QueryAdapter _queryAdapter;
 
   final InsertionAdapter<PokemonListItem> _pokemonListItemInsertionAdapter;
+
+  final UpdateAdapter<PokemonListItem> _pokemonListItemUpdateAdapter;
 
   @override
   Future<List<PokemonListItem>> getPokemonsPart(
@@ -176,6 +187,12 @@ class _$PokemonListItemDao extends PokemonListItemDao {
   @override
   Future<void> insertPokemons(List<PokemonListItem> pokemons) async {
     await _pokemonListItemInsertionAdapter.insertList(
+        pokemons, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> updatePokemons(List<PokemonListItem> pokemons) async {
+    await _pokemonListItemUpdateAdapter.updateList(
         pokemons, OnConflictStrategy.abort);
   }
 }

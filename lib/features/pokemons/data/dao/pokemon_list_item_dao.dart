@@ -19,6 +19,9 @@ abstract class PokemonListItemDao {
   @insert
   Future<void> insertPokemons(List<PokemonListItem> pokemons);
 
+  @update
+  Future<void> updatePokemons(List<PokemonListItem> pokemons);
+
   @Query('DELETE FROM PokemonListItem')
   Future<void> deleteAllPokemons();
 }

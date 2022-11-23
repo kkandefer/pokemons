@@ -29,8 +29,8 @@ class PokemonsListCubit extends Cubit<PokemonsListState> {
       try{
         await pokemonListItemDao.deleteAllPokemons();
         await pokemonListItemDao.insertPokemons(remoteResults);
-
-        sortedResults = await _getMixedItems(0, _limit);
+        sortedResults = await pokemonListItemDao.getPokemonsPart(0, _limit);
+        // sortedResults = await _getMixedItems(0, _limit);
       }
       catch(e, s) {
         log.severe('Unable to save list in database', e, s);
@@ -43,6 +43,11 @@ class PokemonsListCubit extends Cubit<PokemonsListState> {
         results: sortedResults,
         hasRatherMax: sortedResults.isEmpty,
       ));
+
+      List<List<PokemonListItem>> miniTabs = sortedResults.chunked(5).toList();
+      Future.forEach(miniTabs, (List<PokemonListItem> miniTab) async {
+        await _fillImages(miniTab.where((i) => i.imageUrl == null).toList());
+      });
     }
     catch(e, s) {
       emit(state.copyWith(
@@ -59,13 +64,18 @@ class PokemonsListCubit extends Cubit<PokemonsListState> {
     ));
 
     try{
-      // List<PokemonListItem> sortedResults = await pokemonListItemDao.getPokemonsPart(state.results.length, limit ?? _limit);
-      List<PokemonListItem> sortedResults = await _getMixedItems(state.results.length, limit ?? _limit);
+      List<PokemonListItem> sortedResults = await pokemonListItemDao.getPokemonsPart(state.results.length, limit ?? _limit);
+      // List<PokemonListItem> sortedResults = await _getMixedItems(state.results.length, limit ?? _limit);
       emit(state.copyWith(
         results: (state.results + sortedResults).unique((i) => i.id),
         appending: false,
         hasRatherMax: sortedResults.isEmpty,
       ));
+
+      List<List<PokemonListItem>> miniTabs = sortedResults.chunked(5).toList();
+      Future.forEach(miniTabs, (List<PokemonListItem> miniTab) async {
+        await _fillImages(miniTab.where((i) => i.imageUrl == null).toList());
+      });
     }
     catch(e, s) {
       emit(state.copyWith(
@@ -96,5 +106,24 @@ class PokemonsListCubit extends Cubit<PokemonsListState> {
       }
     });
     return sortedResults.map<PokemonListItem>((e) => PokemonListItem(id: e.id, name: e.name, imageUrl: mapOfImages[e.id])).toList();
+  }
+
+  // Zmieniony sposób doczytywania obrazków.
+  // Niby jest lepiej, bo nie blokuje wczytywania listy,
+  // ale i tak to nie jest efektywny sposób.
+  // W realnej aplikacji konieczna byłaby modyfikacja API lub zmiana założeń.
+  Future<void> _fillImages(List<PokemonListItem> itemsToFill) async {
+    Map<int, String?> mapOfImages = {};
+    await Future.forEach(itemsToFill, (PokemonListItem item) async {
+      if(item.imageUrl == null){
+        String? image = await pokemonsRepository.getRemotePokemonImage(id: item.id);
+        mapOfImages.addAll({item.id: image});
+      }
+    });
+    itemsToFill = itemsToFill.map<PokemonListItem>((e) => PokemonListItem(id: e.id, name: e.name, imageUrl: mapOfImages[e.id])).toList();
+    pokemonListItemDao.updatePokemons(itemsToFill);
+    emit(state.copyWith(
+      results: state.results.map((e) => itemsToFill.firstWhere((f) => f.id == e.id, orElse: () => e)).toList()
+    ));
   }
 }

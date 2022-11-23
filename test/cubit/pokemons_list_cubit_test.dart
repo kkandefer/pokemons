@@ -63,6 +63,10 @@ void main() {
       when(
         () => pokemonsRepository.getRemotePokemons(limit: any(named: 'limit'), offset: any(named: 'offset')),
       ).thenAnswer((_) async => Future.value(List<PokemonListItem>.generate(remoteLimit, (i) => mockList[i % mockList.length])));
+      when(
+          () => pokemonsRepository.getRemotePokemonImage(id: any(named: 'id')),
+      ).thenAnswer((_) async => Future.value(null));
+
 
       when(
         () => pokemonListItemDao.getPokemonsPart(any(), any()),
@@ -72,6 +76,9 @@ void main() {
       ).thenAnswer((_) async {});
       when(
         () => pokemonListItemDao.insertPokemons(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => pokemonListItemDao.updatePokemons(any()),
       ).thenAnswer((_) async {});
 
 
