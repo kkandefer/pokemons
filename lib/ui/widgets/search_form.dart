@@ -17,7 +17,6 @@ class SearchForm extends StatefulWidget {
 
 class _SearchFormState extends State<SearchForm> {
 
-  static final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   Timer? _debounce;
 
   @override
@@ -34,7 +33,6 @@ class _SearchFormState extends State<SearchForm> {
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: _formKey,
       child: TextFormField(
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.search,

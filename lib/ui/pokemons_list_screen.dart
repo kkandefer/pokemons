@@ -59,6 +59,8 @@ class _PokemonsListScreenState extends State<PokemonsListScreen> {
         appBar: AppBar(
           backgroundColor: theme.bottomAppBarColor,
           title: SearchForm(),
+          primary: true,
+          automaticallyImplyLeading: false,
         ),
         body: CustomScrollView(
           controller: _scrollController,

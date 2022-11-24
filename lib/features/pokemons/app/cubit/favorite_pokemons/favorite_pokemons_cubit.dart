@@ -78,4 +78,17 @@ class FavoritePokemonsCubit extends Cubit<FavoritePokemonsState> {
       //TODO logowanie do crashlytics, ale w tej wersji nie podłaczam bo nie ma konta
     }
   }
+
+  void updatePokemonsOrder(List<FavoritePokemon> favoritePokemons) async {
+    // print('updatePokemonsOrder');
+    // favoritePokemons.forEach((element) {
+    //   print(element.name);
+    // });
+    int s = 0;
+    favoritePokemons = favoritePokemons.reversed.map((p) => p.copyWith(sequence: s++)).toList();
+    emit(state.copyWith(
+      favorites: favoritePokemons.reversed.toList(),
+    ));
+    await favoritePokemonDao.updateFavoritePokemons(favoritePokemons);
+  }
 }

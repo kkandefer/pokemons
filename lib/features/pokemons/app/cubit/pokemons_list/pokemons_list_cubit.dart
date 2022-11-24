@@ -27,7 +27,9 @@ class PokemonsListCubit extends Cubit<PokemonsListState> {
 
       late List<PokemonListItem> sortedResults;
       try{
-        // await pokemonListItemDao.deleteAllPokemons();//tu kwestia decyzji czy resetować przy starcie czy nie ma potrzeby
+        // tu kwestia decyzji czy resetować przy starcie czy nie ma potrzeby
+        // zostawiam zakomentowane celowo, bo w ten sposób mniej spamujemy API odbyfując o zdjęcia
+        // await pokemonListItemDao.deleteAllPokemons();
         await pokemonListItemDao.insertPokemons(remoteResults);
         sortedResults = await pokemonListItemDao.getPokemonsPart(0, _limit);
       }

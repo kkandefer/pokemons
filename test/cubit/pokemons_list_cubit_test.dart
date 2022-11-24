@@ -120,7 +120,7 @@ void main() {
       );
 
       blocTest<PokemonsListCubit, PokemonsListState>(
-        'handle API error for initialize',
+        'handle API error when initialize',
         setUp: () {
           when(
             () => pokemonsRepository.getRemotePokemons(limit: any(named: 'limit'), offset: any(named: 'offset')),
@@ -152,7 +152,7 @@ void main() {
       );
 
       blocTest<PokemonsListCubit, PokemonsListState>(
-        'handle API error for appending',
+        'handle API error when appending',
         setUp: () {
           when(
               () => pokemonListItemDao.getPokemonsPart(any(), any()),
@@ -171,6 +171,27 @@ void main() {
         ],
       );
 
+      blocTest<PokemonsListCubit, PokemonsListState>(
+        'emits correct hasRatherMax state',
+        setUp: () {
+          when(
+              () => pokemonListItemDao.getPokemonsPart(0, any()),
+          ).thenAnswer((_) async => Future.value([]));
+        },
+        build: () => pokemonsCubit,
+        act: (cubit) => cubit.append(limit: remoteLimit),
+        expect: () => <dynamic>[
+          isA<PokemonsListState>()
+              .having((w) => w.searchStatus, 'searchStatus', PokemonsListStatus.normal)
+              .having((w) => w.appending, 'appending', true)
+              .having((w) => w.hasRatherMax, 'hasRatherMax', false),
+          isA<PokemonsListState>()
+              .having((w) => w.searchStatus, 'searchStatus', PokemonsListStatus.normal)
+              .having((w) => w.appending, 'appending', false)
+              .having((w) => w.results.length, 'resultLength', 0)
+              .having((w) => w.hasRatherMax, 'hasRatherMax', true),
+        ],
+      );
     });
   });
 }
